@@ -7,6 +7,7 @@ from random import randint, randrange
 from datetime import date
 import time
 
+#TODO: maybe implement way of handing in admin username and password through user input. or pull them from environment vars!
 #TODO: implement way of handing in address to microservice API from user input.
 #TODO: determine whether we should create applications. 
 #TODO: implement way of taking in admin username and password from args
