@@ -1,41 +1,56 @@
 import requests
+import request
 import re
-
+import os
+import logging
 from faker import Faker
 from faker.providers import internet, ssn, person, date_time
 from random import randint, randrange
 from datetime import date
 import time
+from dotenv import load_dotenv
 
-#TODO: maybe implement way of handing in admin username and password through user input. or pull them from environment vars!
-#TODO: implement way of handing in address to microservice API from user input.
-#TODO: determine whether we should create applications. 
-#TODO: implement way of taking in admin username and password from args
+#TODO: randomize income.
 #TODO: modify income to randomize.
 #TODO: wrap request api calls with try/except.
+#TODO: logs
 
 def password_cleaner(password):
     new_password = password.replace("+","").replace("(","").replace(")","").replace("+","")
     return new_password
 
+
+''' retrieves admin credentials and microservice hosts from environment.'''
+def retrieve_environment_variables():
+    logging.info(f"retrieving information from environment...")
+
+    return {
+        "admin_username":os.getenv('ALINE_ADMIN_USERNAME'),
+        "admin_password":os.getenv('ALINE_ADMIN_PASSWORD'),
+        "user_host":os.getenv('USER_HOST'),
+        "underwriter_host":os.getenv('UNDERWRITER_HOST'),
+        "transaction_host":os.getenv('TRANSACTION_HOST'),
+        "bank_host":os.getenv('BANK_HOST')
+    }
+
 if __name__ == '__main__' :
 
-    #login
+    #logging
+    logging.basicConfig(filename = "logfile.log", filemode='w', format='[%(asctime)s][%(levelname)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
 
-    login_json = {
-        "username":"admin1" ,
-        "password":"Password1!"
-    } 
+    
+    #retrieve admin credentials, and microservice hosts.
+    environment = retrieve_environment_variables()
+    
+    #login to application using admin username and password.
+    login =  request.login(environment["username"], environment["password"], environment["user_host"]) 
+    
+    if login :  #if successful, extract bearer token.
+        bearer = {'authorization':login.headers['Authorization'] }
+    else:       #if failure, exit program.
+        logging.error("Was not able to acquire bearer token. Exiting process.")
+        quit()
 
-    login = requests.post('http://127.0.0.1:8070/login' , json=login_json)
-
-    print(f"{login.status_code}")
-
-    #extract bearer token
-
-    bearer = {'authorization':login.headers['Authorization'] }
-
-    print(f"Authorization : {bearer}\n\n\n")
 
     fake = Faker()
 
@@ -144,7 +159,7 @@ if __name__ == '__main__' :
 
     #create banks and branches
 
-    for _ in range(50): #TODO: modify this value to ensure more data population
+    for _ in range(50):
 
         phone_number = [str(randint(0, 9)) for _ in range(10)]
         phone_number.insert(3, '-')
