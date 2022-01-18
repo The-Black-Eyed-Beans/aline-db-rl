@@ -1,5 +1,5 @@
 #Data Producer
-## Ricky Lopez
+## Ricky L Lopez
 
 ## Required Environment Variables
 
