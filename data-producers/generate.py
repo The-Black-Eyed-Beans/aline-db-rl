@@ -143,16 +143,16 @@ def bank():
     return bank_json
 
 '''generates branch information and returns it in the proper json format for microservice. requires bank json'''
-def branch(bank_json):
+def branch(bank_json, bank_id):
 
     branch_json = {
         "name": fake.word() + "branch",
-        "phone": phone_number,
+        "phone": phone_number(),
         "address": bank_json["address"],
         "city": bank_json['city'],
         "state": bank_json['state'],
         "zipcode": bank_json['zipcode'],
-        "bankID": bank.json()['id']
+        "bankID": bank_id
     }
 
     return branch_json

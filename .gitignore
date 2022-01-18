@@ -1,1 +1,9 @@
+#Mac metadata file
 .DS_Store
+
+#Environment Variables
+env.ps1
+
+#python bytecode files
+data-producers/__pycache__/
+

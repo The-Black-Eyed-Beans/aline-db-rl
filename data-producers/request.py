@@ -32,21 +32,31 @@ def login(username, password, user_host):
     } 
 
     logging.debug(f"Sending request to server...")
-    login = requests.post(user_host , json=login_json)
 
-    if login.status_code in range(200, 300):
+    try: 
+        login = requests.post(user_host + '/login' , json=login_json)
+        login.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        logging.warning(f"{err} ({login.content})")
+
+        
+    if login.status_code in range(200, 301):
         logging.info("Login successful.")
-        logging.info(f"STATUS CODE: {login.status_code} ({login.reason})")
-    elif login.status_code in range(300, 400):
+        logging.info(f"STATUS CODE: {login.status_code} ({login.content})")
+    elif login.status_code in range(300, 401):
         logging.warning("Login unsuccessful.")
-        logging.error(f"CLIENT ERROR CODE {login.status_code} ({login.reason})")
+        logging.error(f"CLIENT ERROR CODE {login.status_code} ({login.content})")
         return 0
-    elif login.status_code in range(400, 500):
+    elif login.status_code in range(400, 501):
         logging.warning("Login unsuccessful.")
-        logging.error(f"SERVER ERROR CODE {login.status_code} ({login.reason})")
+        logging.error(f"SERVER ERROR CODE {login.status_code} ({login.content})")
         return 0
     else:
-        logging.info(f"STATUS CODE: {login.status_code} ({login.reason})")
+        logging.info(f"STATUS CODE: {login.status_code} ({login.content})")
+
+
+    #bearer = {'authorization':login.headers['Authorization'] }
+
     
     return login
 
@@ -60,18 +70,24 @@ def post_entity(json, headers, host, route):
     
     logging.debug("Sending request to server...")
 
-    response = requests.post(host+route, json=json, headers=headers)
+    try:
+        response = requests.post(host+route, json=json, headers=headers)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        logging.warning(f"{err} ({response.content})")
 
+    
+    #This causes issues with responses that return an unsuccessful response, yet still perform the data production. TODO
     if response.status_code in range(200, 300):
-        logging.debug(f"STATUS CODE: {response.status_code} ({response.reason})")
+        logging.debug(f"STATUS CODE: {response.status_code} ({response.content})")
     elif response.status_code in range(300, 400):
-        logging.error(f"CLIENT ERROR CODE {response.status_code} ({response.reason})")
         return 0
     elif response.status_code in range(400, 500):
-        logging.error(f"SERVER ERROR CODE {response.status_code} ({response.reason})")
+        logging.error(f"SERVER ERROR CODE {response.status_code} ({response.content})")
         return 0
     else:
-        logging.info(f"STATUS CODE: {response.status_code} ({response.reason})")
+        logging.info(f"STATUS CODE: {response.status_code} ({response.content})")
+    
 
     return response
 
@@ -96,7 +112,7 @@ def add_applicant(applicant_json, bearer, underwriter_host):
         logging.error(f"SERVER ERROR CODE {response.status_code} ({response.reason})")
         return 0
     else:
-        logging.info(f"STATUS CODE: {response.status_code} ({response.reason})")
+        logging.error(f"STATUS CODE: {response.status_code} ({response.reason})")
 
     return 1
 

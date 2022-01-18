@@ -29,15 +29,18 @@ def applications_to_users(user_amount, transaction_amount, bearer):
 
         application = request.post_entity(application_json, bearer, os.getenv('UNDERWRITER_HOST'), '/applications') #application creation request
 
-
-        user_json = generate.user({
-            'first_name':applicant_json["firstName"],
-            'last_name':applicant_json['lastName'],
-            'email':applicant_json['email'],
-            'phone':applicant_json['phone'],
-            'membership_id':application.json()['createMembers'][0]['membershipId'],
-            'ssn':application_json["socialSecurity"]
-        })
+        try:
+            user_json = generate.user(
+                first_name=applicant_json["firstName"],
+                last_name=applicant_json['lastName'],
+                email=applicant_json['email'],
+                phone=applicant_json['phone'],
+                membership_id=application.json()['createdMembers'][0]['membershipId'],
+                ssn=applicant_json["socialSecurity"]
+            )
+        except:
+            print(f"application status code: {application.status_code}\ncontent: {application.content}\n\n\n")
+            exit()
 
         user = request.post_entity(user_json, bearer, os.getenv('USER_HOST'), '/users/registration')
 
@@ -57,7 +60,7 @@ def banks_and_branches(amount, bearer):
 
         bank = request.post_entity(bank_json, bearer, os.getenv('BANK_HOST'), '/banks')
 
-        branch_json = generate.branch(bank_json)    
+        branch_json = generate.branch(bank_json, bank.json()['id'])    
 
         branch = request.post_entity(branch_json, bearer, os.getenv('BANK_HOST'), '/branches')
 
