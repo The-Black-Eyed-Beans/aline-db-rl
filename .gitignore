@@ -7,3 +7,6 @@ env.ps1
 #python bytecode files
 data-producers/__pycache__/
 
+#logfile
+data-producers/logfile.log
+
