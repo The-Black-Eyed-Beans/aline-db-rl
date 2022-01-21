@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 
 import request
@@ -9,7 +10,7 @@ import produce
 if __name__ == '__main__' :
 
     #logging
-    logging.basicConfig(filename = "logfile.log", filemode='w', format='[%(asctime)s][%(levelname)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
+    logging.basicConfig(stream = sys.stdout, filemode='w', format='[%(asctime)s][%(levelname)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
     
     response = request.login(os.getenv('ALINE_ADMIN_USERNAME'), os.getenv('ALINE_ADMIN_PASSWORD'), os.getenv('USER_HOST')) 
     
@@ -19,6 +20,6 @@ if __name__ == '__main__' :
     else: #if success, retrieve bearer token.
         bearer = {'authorization':response.headers['Authorization'] }
 
-    produce.applications_to_users(50, 1, bearer)
+    produce.applications_to_users(50, 10, bearer)
 
     produce.banks_and_branches(10, bearer)
